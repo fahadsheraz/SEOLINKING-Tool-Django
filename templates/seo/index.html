@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Linking Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/seo/css/styles.css" rel="stylesheet">
+</head>
+<body>
+<header class="site-header py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/" class="brand d-flex align-items-center gap-2">
+            <div class="brand-mark">IL</div>
+            <div>
+                <div class="brand-name">Internal Linking Tool</div>
+                <div class="brand-tag">SEO AI Assistant</div>
+            </div>
+        </a>
+        <nav class="nav-links d-none d-md-flex align-items-center gap-4">
+            <a href="#features">Features</a>
+            <a href="#suggestions">Suggestions</a>
+            <a href="#highlights">Highlights</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-xl-6">
+                <span class="hero-badge">Professional SEO tool</span>
+                <h1 class="hero-title mt-3">Analyze blog content and generate premium internal linking recommendations instantly.</h1>
+                <p class="hero-copy mt-4">Use AI-backed internal linking guidance to strengthen topical authority, improve page flow, and boost SEO relevance with natural anchor text placements.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                    <div class="stat-box">
+                        <strong>5–10 suggestions</strong>
+                        <span>Each analysis</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong>Natural anchor text</strong>
+                        <span>No keyword stuffing</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card hero-card p-4 p-lg-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="h5 mb-2">Start your analysis</h3>
+                        <p class="text-muted mb-0">Paste your blog content and optional keywords to generate internal link suggestions.</p>
+                    </div>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.blog_content.label_tag }}
+                            {{ form.blog_content }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.target_keywords.label_tag }}
+                            {{ form.target_keywords }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Analyze Content</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="features-section py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Fast insight</h4>
+                    <p class="text-muted">Quality internal linking suggestions in seconds without manual keyword mapping.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon">🔗</div>
+                    <h4>Contextual links</h4>
+                    <p class="text-muted">Recommendations focus on relevant placement and anchor text within your actual content.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon">📈</div>
+                    <h4>SEO-first strategy</h4>
+                    <p class="text-muted">Designed to avoid over-optimization while improving topical relevance and UX.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pb-5">
+    {% if suggestions %}
+        <section id="suggestions" class="results-section mb-5">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-8">
+                    <h2 class="section-title">Internal Linking Suggestions</h2>
+                    <p class="section-subtitle text-muted">Professional SEO recommendations tailored to your article structure.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-outline-primary" id="export-button" data-export-text="{{ export_text|escapejs }}">Export Suggestions</button>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+                {% for suggestion in suggestions %}
+                    <div class="col">
+                        <div class="card suggestion-card h-100">
+                            <div class="card-body">
+                                <span class="suggestion-pill">Suggestion {{ forloop.counter }}</span>
+                                <p class="mb-2"><strong>Anchor Text:</strong> {{ suggestion.anchor_text }}</p>
+                                <p class="mb-2"><strong>Suggested Link Topic:</strong> {{ suggestion.suggested_link_topic }}</p>
+                                <p class="mb-2"><strong>Placement:</strong> {{ suggestion.placement }}</p>
+                                <p class="mb-3"><strong>Reason:</strong> {{ suggestion.reason }}</p>
+                                <button class="btn btn-sm btn-outline-primary copy-button" data-copy="Anchor Text: {{ suggestion.anchor_text }}\nSuggested Link Topic: {{ suggestion.suggested_link_topic }}\nPlacement: {{ suggestion.placement }}\nReason: {{ suggestion.reason }}">Copy Suggestion</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="highlights" class="highlights-section">
+            <div class="row gy-4">
+                <div class="col-lg-8">
+                    <div class="card result-card p-4 h-100">
+                        <h3 class="h5 mb-3">Suggested Content Highlights</h3>
+                        <p class="text-muted mb-4">Highlighted sentences are suggested anchor point areas that align with your content flow.</p>
+                        <div id="highlighted-content" class="p-4">{{ highlighted_html|safe }}</div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card result-card p-4 h-100">
+                        <h5 class="mb-3">Why this matters</h5>
+                        <ul class="list-unstyled text-muted lh-lg">
+                            <li>• Enhances page authority through relevant internal connections.</li>
+                            <li>• Encourages user engagement with smarter navigation.</li>
+                            <li>• Keeps anchor text natural and helpful.</li>
+                            <li>• Improves topical relevancy without stuffing.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/seo/js/main.js"></script>
+</body>
+</html>
